@@ -1,5 +1,3 @@
-import pytest
-
 from credit_calculator import CreditCalculator
 
 

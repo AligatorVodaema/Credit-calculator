@@ -8,6 +8,7 @@ authors = ["AligatorVodaema <ignatev.vsevolod@mail.ru>"]
 python = "^3.9"
 python-Levenshtein = "^0.12.2"
 pytest = "^6.2.5"
+loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 

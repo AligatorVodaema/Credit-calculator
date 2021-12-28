@@ -1,9 +1,22 @@
 import calendar
 import datetime as dt
 from typing import Dict, Union
+import os
+import sys
+
+from loguru import logger
 
 from serializers import InputSerializer, InputSerializerError
-            
+
+CURRENT_DIR = os.path.dirname(__file__)
+logger.remove()
+logger.add(
+    CURRENT_DIR + '/logs/input_output.log',
+    level='SUCCESS',
+    rotation='24h'
+)
+logger.add(sys.stdout, level='INFO')
+
 
 class CreditCalculator:
     
@@ -16,6 +29,7 @@ class CreditCalculator:
         parsed_data = InputSerializer(user_input).parse_input()
 
         self.payment_type = self.PAYMENT_TYPES[payment_type]
+        logger.info(f'Payment type is: {self.payment_type}.')
         self.amount = parsed_data['amount']
         self.interest = parsed_data['interest']
         self.downpayment = parsed_data['downpayment']
@@ -61,8 +75,6 @@ class CreditCalculator:
         
         Depending on the type of loan payment.
         """
-        print(f'{self.payment_type=}')
-        
         if self.payment_type == 'annuity':
             monthly_payment = self._annuity_payment_type()
             total_payout = monthly_payment * (self.term * 12)
@@ -127,11 +139,13 @@ class CreditCalculator:
         monthly_payment = self.calc_monthly_payment()
         total_payout = self.clac_total_payout()
         amount_of_accrued_interest = self.calc_amount_of_accrued_interest()
-        return {
+        result = {
             'monthly_payment': monthly_payment,
             'total_payout': total_payout,
             'amount_of_accrued_interest': amount_of_accrued_interest
         }
+        logger.success('All calculations result: {}', result)
+        return result
     
     
 if __name__ == '__main__':

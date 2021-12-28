@@ -3,6 +3,7 @@ import re
 from typing import Dict, List
 
 from Levenshtein import distance
+from loguru import logger
 
 
 class InputSerializerError(Exception):
@@ -14,6 +15,7 @@ class InputSerializer:
     REQUIRED_KEYS = ('amount', 'interest', 'downpayment', 'term')
     
     def __init__(self, user_input: str) -> None:
+        logger.success('Raw input: {}', user_input)
         self.raw_input = user_input
         return None
     
@@ -29,6 +31,7 @@ class InputSerializer:
             )
             
         result_dict = self._parse_key_value(four_raw_string)
+        logger.success(f'Parsed data: {result_dict}')
         return result_dict
     
     def _parse_key_value(self, four_raw_string: List[str]) -> Dict:
