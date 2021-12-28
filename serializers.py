@@ -1,6 +1,6 @@
 import ast
 import re
-from typing import Dict
+from typing import Dict, List
 
 from Levenshtein import distance
 
@@ -10,6 +10,7 @@ class InputSerializerError(Exception):
 
 
 class InputSerializer:
+    """Class for serializing input."""
     REQUIRED_KEYS = ('amount', 'interest', 'downpayment', 'term')
     
     def __init__(self, user_input: str) -> None:
@@ -17,6 +18,7 @@ class InputSerializer:
         return None
     
     def parse_input(self) -> Dict:
+        """Parse the inputted string into Dict."""
         array_raw_strings = (self.raw_input).split('\n')
         four_raw_string = [string for string in array_raw_strings if string]
         
@@ -26,6 +28,11 @@ class InputSerializer:
                 f'Must be: {", ".join(self.REQUIRED_KEYS)}'
             )
             
+        result_dict = self.parse_key_value(four_raw_string)
+        return result_dict
+    
+    def parse_key_value(self, four_raw_string: List[str]) -> Dict:
+        """Split strings into key and value."""
         result_dict = {}
         for _ in range(4):
             key, value = four_raw_string[_].split(': ')

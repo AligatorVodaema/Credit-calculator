@@ -12,6 +12,7 @@ class CreditCalculator:
         'dif': 'differentiated'
     }
     def __init__(self, user_input: str, payment_type: str = 'ann') -> None:
+        """Parse user input string and save it."""
         parsed_data = InputSerializer(user_input).parse_input()
 
         self.payment_type = self.PAYMENT_TYPES[payment_type]
@@ -22,7 +23,10 @@ class CreditCalculator:
         return None
     
     def calc_monthly_payment(self) -> float:
-        """Месячная выплата по кредиту."""
+        """Calculate monthly loan payment.
+        
+        Depending on the type of loan payment.
+        """
         if self.payment_type == self.PAYMENT_TYPES['ann']:
             result = self.annuity_payment_type()
             
@@ -43,13 +47,20 @@ class CreditCalculator:
         return result
     
     def calc_amount_of_accrued_interest(self) -> float:
-        """Общий объём начисленных процентов."""
+        """Calculate amount of accrued interest.
+        
+        The difference between the total amount of the payment
+        and the body of the loan.
+        """
         return round(
             self.clac_total_payout() - (self.amount - self.downpayment), 2
         )
     
     def clac_total_payout(self) -> float:
-        """Общая сумма выплаты."""
+        """Calculate the total payout.
+        
+        Depending on the type of loan payment.
+        """
         print(f'{self.payment_type=}')
         
         if self.payment_type == 'annuity':
@@ -76,6 +87,7 @@ class CreditCalculator:
         return round(total_payout, 2)
 
     def annuity_payment_type(self) -> float:
+        """Calculate a one-time annuity payment."""
         credit_amount = self.amount - self.downpayment
         monthly_interest = self.interest / 12 / 100
         term_in_months = self.term * 12
@@ -91,6 +103,7 @@ class CreditCalculator:
         days_in_current_month: int,
         main_debt: Union[int, float]
     ) -> float:
+        """Calculate a one-time differentiated payment."""
         now = dt.datetime.now()
         days_in_current_year = 365
         if calendar.isleap(now.year):
@@ -106,6 +119,11 @@ class CreditCalculator:
         return round(monthly_body_debt + differentiated_interest, 2)
         
     def __call__(self) -> Tuple:
+        """Calculate complete information on the loan.
+        
+        Returns tuple with: Monthly loan payment,
+        the total payout, amount of accrued interest.
+        """
         monthly_payment = self.calc_monthly_payment()
         total_payout = self.clac_total_payout()
         amount_of_accrued_interest = self.calc_amount_of_accrued_interest()
