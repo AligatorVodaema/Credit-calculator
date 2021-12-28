@@ -1,6 +1,6 @@
 import calendar
 import datetime as dt
-from typing import Tuple, Union
+from typing import Dict, Union
 
 from serializers import InputSerializer, InputSerializerError
             
@@ -28,14 +28,14 @@ class CreditCalculator:
         Depending on the type of loan payment.
         """
         if self.payment_type == self.PAYMENT_TYPES['ann']:
-            result = self.annuity_payment_type()
+            result = self._annuity_payment_type()
             
         elif self.payment_type == self.PAYMENT_TYPES['dif']:
             main_debt = self.amount - self.downpayment
             now = dt.datetime.now()
             days_in_current_month = calendar.monthrange(now.year, now.month)[1]
             
-            result = self.differentiated_payment_type(
+            result = self._differentiated_payment_type(
                 days_in_current_month=days_in_current_month,
                 main_debt=main_debt
             )
@@ -64,7 +64,7 @@ class CreditCalculator:
         print(f'{self.payment_type=}')
         
         if self.payment_type == 'annuity':
-            monthly_payment = self.annuity_payment_type()
+            monthly_payment = self._annuity_payment_type()
             total_payout = monthly_payment * (self.term * 12)
         
         now = dt.datetime.now().month - 1
@@ -79,14 +79,14 @@ class CreditCalculator:
         total_payout = 0
         for _ in range(self.term):
             for month in current_months_order:
-                total_payout += self.differentiated_payment_type(
+                total_payout += self._differentiated_payment_type(
                     month, main_debt
                 )
                 main_debt -= principal_balance
                 
         return round(total_payout, 2)
 
-    def annuity_payment_type(self) -> float:
+    def _annuity_payment_type(self) -> float:
         """Calculate a one-time annuity payment."""
         credit_amount = self.amount - self.downpayment
         monthly_interest = self.interest / 12 / 100
@@ -98,7 +98,7 @@ class CreditCalculator:
         )
         return round(annuity_rate * credit_amount, 2)
     
-    def differentiated_payment_type(
+    def _differentiated_payment_type(
         self,
         days_in_current_month: int,
         main_debt: Union[int, float]
@@ -118,7 +118,7 @@ class CreditCalculator:
         monthly_body_debt = (self.amount - self.downpayment) / term_in_months
         return round(monthly_body_debt + differentiated_interest, 2)
         
-    def __call__(self) -> Tuple:
+    def __call__(self) -> Dict:
         """Calculate complete information on the loan.
         
         Returns tuple with: Monthly loan payment,
@@ -127,11 +127,11 @@ class CreditCalculator:
         monthly_payment = self.calc_monthly_payment()
         total_payout = self.clac_total_payout()
         amount_of_accrued_interest = self.calc_amount_of_accrued_interest()
-        return (
-            monthly_payment,
-            total_payout,
-            amount_of_accrued_interest
-        )
+        return {
+            'monthly_payment': monthly_payment,
+            'total_payout': total_payout,
+            'amount_of_accrued_interest': amount_of_accrued_interest
+        }
     
     
 if __name__ == '__main__':
@@ -140,7 +140,6 @@ if __name__ == '__main__':
         'dif'
     )
     print(calc1())
-    
     
     calc2 = CreditCalculator(
         'amount: 100000\ninterest: 5.5%\ndownpayment: 20000\nterm: 1\n',

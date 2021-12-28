@@ -28,10 +28,10 @@ class InputSerializer:
                 f'Must be: {", ".join(self.REQUIRED_KEYS)}'
             )
             
-        result_dict = self.parse_key_value(four_raw_string)
+        result_dict = self._parse_key_value(four_raw_string)
         return result_dict
     
-    def parse_key_value(self, four_raw_string: List[str]) -> Dict:
+    def _parse_key_value(self, four_raw_string: List[str]) -> Dict:
         """Split strings into key and value."""
         result_dict = {}
         for _ in range(4):
@@ -48,10 +48,9 @@ class InputSerializer:
             key = self.REQUIRED_KEYS[_]
             
             incorrect_msg = 'Incorrect value: "{}" for field: "{}".'
-            
-            value = re.search(r'[\d.]+', value).group(0)
             try:
-                value = ast.literal_eval(value)
+                value = re.search(r'[\d.|,]+', value).group(0)
+                value = ast.literal_eval(value.replace(',', '.'))
             except Exception:
                 raise InputSerializerError(incorrect_msg.format(value, key))
             
