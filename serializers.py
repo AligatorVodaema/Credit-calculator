@@ -1,6 +1,6 @@
 import ast
 import re
-from typing import Dict, List
+from typing import Dict, Iterable, List
 
 from Levenshtein import distance
 from loguru import logger
@@ -15,7 +15,7 @@ class InputSerializer:
     REQUIRED_KEYS = ('amount', 'interest', 'downpayment', 'term')
     
     def __init__(self, user_input: str) -> None:
-        logger.success('Raw input: {}', user_input)
+        logger.success('Raw input: {}', user_input.replace('\n', '\\n'))
         self.raw_input = user_input
         return None
     
@@ -34,7 +34,7 @@ class InputSerializer:
         logger.success(f'Parsed data: {result_dict}')
         return result_dict
     
-    def _parse_key_value(self, four_raw_string: List[str]) -> Dict:
+    def _parse_key_value(self, four_raw_string: Iterable[str]) -> Dict:
         """Split strings into key and value."""
         result_dict = {}
         for _ in range(4):
@@ -43,7 +43,7 @@ class InputSerializer:
                 raise InputSerializerError('Missing field or value.')
             
             # correcting typos.
-            if min([distance(key, word) for word in self.REQUIRED_KEYS]) > 2:
+            if min(distance(key, word) for word in self.REQUIRED_KEYS) > 2:
                 raise InputSerializerError(
                     f'"{key}" wrong field. Available fields is: '
                     f'{", ".join(self.REQUIRED_KEYS)}'
