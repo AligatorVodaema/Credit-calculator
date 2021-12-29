@@ -1,4 +1,4 @@
-from credit_calculator import (CreditCalculatorAnnuityType,
+from credit_calculators import (CreditCalculatorAnnuityType,
                                CreditCalculatorDifferentiatedType)
 
 
